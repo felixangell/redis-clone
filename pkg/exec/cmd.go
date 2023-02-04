@@ -40,3 +40,14 @@ func (h HelloCommand) Execute(*KafkaNodeOrchestrator) api.Value {
 func NewHelloCommand() HelloCommand {
 	return HelloCommand{}
 }
+
+type SetCommand struct{}
+
+func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator) api.Value {
+	// FIXME draw the rest of the owl
+	return api.MakeSimpleString("OK")
+}
+
+func NewSetCommand() SetCommand {
+	return SetCommand{}
+}

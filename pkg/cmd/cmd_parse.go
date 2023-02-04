@@ -3,17 +3,16 @@ package cmd
 import (
 	"fmt"
 	"github.com/bat-labs/krake/pkg/api"
-	"github.com/bat-labs/krake/pkg/data"
 	"reflect"
 )
 
-func ParseCommand(v data.Value) (api.RESP, error) {
-	bs, ok := v.(data.Array)
+func ParseCommand(v api.Value) (Command, error) {
+	bs, ok := v.(api.Array)
 	if !ok {
 		panic(fmt.Sprintf("Did not expect value as command %s (type %s)", v, reflect.TypeOf(v)))
 	}
 
-	cmdNameMsg, ok := bs.Data[0].(data.BulkString)
+	cmdNameMsg, ok := bs.Data[0].(api.BulkString)
 	if !ok {
 		panic(fmt.Sprintf("Did not expect value as command %s (type %s)", v, reflect.TypeOf(v)))
 	}
@@ -23,7 +22,7 @@ func ParseCommand(v data.Value) (api.RESP, error) {
 	case "HELLO":
 		fallthrough
 	case "hello":
-		return api.MakeSimpleString("OK"), nil
+		return NewHelloCommand(), nil
 	}
 
 	panic(fmt.Sprintf("Unhandled command %s", cmd))

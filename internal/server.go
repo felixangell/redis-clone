@@ -2,16 +2,19 @@ package internal
 
 import (
 	"fmt"
+	"github.com/bat-labs/krake/pkg/cmd"
 	"github.com/bat-labs/krake/pkg/parse"
-	"log"
 	"net"
 )
 
 type Krake struct {
+	orchestrator *KafkaNodeOrchestrator
 }
 
 func NewKrakeServer() *Krake {
-	return &Krake{}
+	return &Krake{
+		&KafkaNodeOrchestrator{},
+	}
 }
 
 func (k *Krake) ListenAndServe(address string) {
@@ -35,12 +38,14 @@ func (k *Krake) ListenAndServe(address string) {
 					return
 				}
 
-				response := parse.ParseMessage(buf[:bufLen])
-				log.Println("<", response)
-				_, err = conn.Write(response.Serialize())
+				value := parse.ParseMessage(buf[:bufLen])
+
+				command, err := cmd.ParseCommand(value)
 				if err != nil {
-					log.Println(err.Error())
+					panic(err)
 				}
+
+				k.orchestrator.submit(conn, command)
 			}
 		}(conn)
 	}

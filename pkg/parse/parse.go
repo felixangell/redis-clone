@@ -3,8 +3,6 @@ package parse
 import (
 	"fmt"
 	"github.com/bat-labs/krake/pkg/api"
-	"github.com/bat-labs/krake/pkg/cmd"
-	"github.com/bat-labs/krake/pkg/data"
 	"log"
 	"strconv"
 )
@@ -36,7 +34,7 @@ func (p *parserContext) hasNext() bool {
 	return p.pos < len(p.data)
 }
 
-func (p *parserContext) parseBulkString() data.Value {
+func (p *parserContext) parseBulkString() api.Value {
 	p.expect(api.BulkStringPrefix)
 
 	strLen := p.parseExpectedNumericValue()
@@ -48,32 +46,32 @@ func (p *parserContext) parseBulkString() data.Value {
 	}
 	p.expectTerminator()
 
-	return data.BulkString{
+	return api.BulkString{
 		Length: strLen,
 		Data:   content,
 	}
 }
 
-func (p *parserContext) parseArray() data.Array {
+func (p *parserContext) parseArray() api.Array {
 	p.expect('*')
 	arrayLen := p.parseExpectedNumericValue()
 
-	var values []data.Value
+	var values []api.Value
 	for i := 0; i < arrayLen; i++ {
 		values = append(values, p.parseValue())
 	}
 
-	return data.Array{
+	return api.Array{
 		Length: arrayLen,
 		Data:   values,
 	}
 }
 
-func (p *parserContext) parseInteger() data.Value {
+func (p *parserContext) parseInteger() api.Value {
 	p.expect(':')
 	bytes := p.consumeUntilTerminator()
 	p.expectTerminator()
-	return data.IntegerValue{
+	return api.IntegerValue{
 		Data: bytes,
 	}
 }
@@ -127,7 +125,7 @@ func (p *parserContext) consumeWhile(pred func(val byte, futureBytes ...byte) bo
 	return datas
 }
 
-func (p *parserContext) parseValue() data.Value {
+func (p *parserContext) parseValue() api.Value {
 	curr := p.peek()
 
 	switch curr {
@@ -175,7 +173,7 @@ func (p *parserContext) contextualBlame(pos int) string {
 	return underlineSpan(p.data, [2]int{pos, pos})
 }
 
-func ParseMessage(data []byte) api.RESP {
+func ParseMessage(data []byte) api.Value {
 	log.Printf("%q\n", string(data))
 
 	p := parserContext{
@@ -183,14 +181,8 @@ func ParseMessage(data []byte) api.RESP {
 		data: data,
 	}
 
-	for p.hasNext() {
-		val := p.parseValue()
-		response, err := cmd.ParseCommand(val)
-		if err != nil {
-			panic(err)
-		}
-		return response
+	if p.hasNext() {
+		return p.parseValue()
 	}
-
 	panic("Reached end of input")
 }

@@ -18,5 +18,5 @@ func TestParseArray(t *testing.T) {
 
 	result := p.parseArray()
 	assert.Equal(t, 1, result.Length)
-	assert.Equal(t, api.MakeBulkString("SET").AsModel(), result.Data[0])
+	assert.Equal(t, api.MakeBulkString("SET"), result.Data[0])
 }

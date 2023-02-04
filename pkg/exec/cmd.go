@@ -1,19 +1,23 @@
-package cmd
+package exec
 
-import "github.com/bat-labs/krake/pkg/api"
+import (
+	"github.com/bat-labs/krake/pkg/api"
+)
 
 type Command interface {
-	Execute() api.Value
+	Execute(*KafkaNodeOrchestrator) api.Value
 }
 
 type HelloCommand struct {
 }
 
-func (h HelloCommand) Execute() api.Value {
+func (h HelloCommand) Execute(*KafkaNodeOrchestrator) api.Value {
 	// HELLO command returns a MAP of the configuration for this
 	// cluster according to the redis spec.
 
 	// TODO grab this from orchestrator
+	// research all the values to send incl mandatory
+	// and whats available.
 	configMap := api.KeyValueMap{
 		"REDIS000000000017.0": "",
 		"run_id":              "54a7ed1c17b0a7f9dbb1286b4e64a14f88c0dde7",

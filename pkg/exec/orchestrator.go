@@ -1,7 +1,6 @@
-package internal
+package exec
 
 import (
-	"github.com/bat-labs/krake/pkg/cmd"
 	"log"
 	"net"
 )
@@ -9,8 +8,8 @@ import (
 type KafkaNodeOrchestrator struct {
 }
 
-func (o KafkaNodeOrchestrator) submit(conn net.Conn, command cmd.Command) {
-	response := command.Execute()
+func (o *KafkaNodeOrchestrator) Submit(conn net.Conn, command Command) {
+	response := command.Execute(o)
 	_, err := conn.Write(response.Serialize())
 	if err != nil {
 		log.Println(err.Error())

@@ -23,9 +23,11 @@ func ParseCommand(v api.Value) (Command, error) {
 
 	switch cmd {
 	case "hello":
-		return NewHelloCommand(), nil
+		return NewHelloCommand(bs.Data[1:]), nil
 	case "set":
-		return NewSetCommand(), nil
+		return NewSetCommand(bs.Data[1:]), nil
+	case "get":
+		return NewGetCommand(bs.Data[1:]), nil
 	}
 
 	panic(fmt.Sprintf("Unhandled command %s", cmd))

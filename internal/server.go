@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"github.com/bat-labs/krake/cache"
 	"github.com/bat-labs/krake/pkg/exec"
 	"github.com/bat-labs/krake/pkg/parse"
 	"net"
@@ -12,8 +13,9 @@ type Krake struct {
 }
 
 func NewKrakeServer() *Krake {
+	cacheBackend := cache.NewInMemoryCache()
 	return &Krake{
-		&exec.KafkaNodeOrchestrator{},
+		orchestrator: exec.NewKafkaNodeOrchestrator(cacheBackend),
 	}
 }
 

@@ -2,6 +2,7 @@ package exec
 
 import (
 	"github.com/bat-labs/krake/pkg/api"
+	"log"
 )
 
 type Command interface {
@@ -37,17 +38,38 @@ func (h HelloCommand) Execute(*KafkaNodeOrchestrator) api.Value {
 	return configMap
 }
 
-func NewHelloCommand() HelloCommand {
+func NewHelloCommand([]api.Value) HelloCommand {
 	return HelloCommand{}
 }
 
-type SetCommand struct{}
+type SetCommand struct {
+	args []api.Value
+}
 
 func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator) api.Value {
-	// FIXME draw the rest of the owl
+	// set key, value
+	key := string(s.args[0].(api.BulkString).Data)
+	log.Println("Received key", key, "setting to", s.args[1])
+	orchestrator.Set(key, s.args[1])
 	return api.MakeSimpleString("OK")
 }
 
-func NewSetCommand() SetCommand {
-	return SetCommand{}
+func NewSetCommand(args []api.Value) SetCommand {
+	return SetCommand{
+		args: args,
+	}
+}
+
+type GetCommand struct {
+	args []api.Value
+}
+
+func (g GetCommand) Execute(orchestrator *KafkaNodeOrchestrator) api.Value {
+	key := string(g.args[0].(api.BulkString).Data)
+	result := orchestrator.Get(key)
+	return result
+}
+
+func NewGetCommand(args []api.Value) GetCommand {
+	return GetCommand{args: args}
 }

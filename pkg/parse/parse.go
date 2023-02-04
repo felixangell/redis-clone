@@ -177,7 +177,6 @@ func (p *parserContext) contextualBlame(pos int) string {
 
 func ParseMessage(data []byte) api.RESP {
 	log.Printf("%q\n", string(data))
-	log.Println("...")
 
 	p := parserContext{
 		pos:  0,
@@ -186,11 +185,12 @@ func ParseMessage(data []byte) api.RESP {
 
 	for p.hasNext() {
 		val := p.parseValue()
-		_, err := cmd.ParseCommand(val)
+		response, err := cmd.ParseCommand(val)
 		if err != nil {
 			panic(err)
 		}
+		return response
 	}
 
-	return api.MakeSimpleString("OK")
+	panic("Reached end of input")
 }

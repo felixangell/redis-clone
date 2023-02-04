@@ -36,6 +36,7 @@ func (s SimpleString) Serialize() []byte {
 	var buffer bytes.Buffer
 	buffer.WriteByte(byte(SimpleStringPrefix))
 	buffer.WriteString(s.Value)
+	buffer.Write(TerminatorByteSequence)
 	return buffer.Bytes()
 }
 

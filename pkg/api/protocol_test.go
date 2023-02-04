@@ -9,3 +9,7 @@ func TestBulkStringEncoding(t *testing.T) {
 	assert.Equal(t, "$5\r\nhello\r\n", string(MakeBulkString("hello").Serialize()))
 	assert.Equal(t, "$0\r\n\r\n", string(MakeBulkString("").Serialize()))
 }
+
+func TestMakeSimpleString(t *testing.T) {
+	assert.Equal(t, "+OK\r\n", string(MakeSimpleString("OK").Serialize()))
+}

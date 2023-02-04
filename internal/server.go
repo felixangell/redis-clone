@@ -8,7 +8,6 @@ import (
 )
 
 type Krake struct {
-	listener net.Listener
 }
 
 func NewKrakeServer() *Krake {
@@ -20,7 +19,6 @@ func (k *Krake) ListenAndServe(address string) {
 	if err != nil {
 		panic(err)
 	}
-	k.listener = listener
 
 	for {
 		conn, err := listener.Accept()
@@ -29,25 +27,24 @@ func (k *Krake) ListenAndServe(address string) {
 		}
 
 		go func(conn net.Conn) {
-			buf := make([]byte, 1024)
-			len, err := conn.Read(buf)
-			if err != nil {
-				fmt.Printf("Error reading: %#v\n", err)
-				return
-			}
+			for {
+				buf := make([]byte, 1024)
+				bufLen, err := conn.Read(buf)
+				if err != nil {
+					fmt.Printf("Error reading: %#v\n", err)
+					return
+				}
 
-			response := parse.ParseMessage(buf[:len])
-			_, err = conn.Write(response.Serialize())
-			if err != nil {
-				log.Println(err.Error())
+				response := parse.ParseMessage(buf[:bufLen])
+				log.Println("<", response)
+				_, err = conn.Write(response.Serialize())
+				if err != nil {
+					log.Println(err.Error())
+				}
 			}
 		}(conn)
 	}
 }
 
 func (k *Krake) Close() {
-	err := k.listener.Close()
-	if err != nil {
-		panic(err)
-	}
 }

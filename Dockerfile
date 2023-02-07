@@ -6,10 +6,9 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
-COPY *.go ./
-
-RUN go build cmd/server/main.go -o /main
+COPY . ./
+RUN go build -o main cmd/server/main.go
 
 EXPOSE 9093
 
-CMD [ "/main" ]
+CMD [ "/app/main" ]

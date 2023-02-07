@@ -1,0 +1,23 @@
+version: '3.1'
+services:
+  krake-1:
+    image: bat-labs/krake:latest
+    network_mode: host
+    ports:
+      - "9093:9093"
+    environment:
+      TODO: "hello!"
+  krake-2:
+    image: bat-labs/krake:latest
+    network_mode: host
+    ports:
+      - "9093:9093"
+    environment:
+      TODO: "hello!"
+  krake-3:
+    image: bat-labs/krake:latest
+    network_mode: host
+    ports:
+      - "9093:9093"
+    environment:
+      TODO: "hello!"

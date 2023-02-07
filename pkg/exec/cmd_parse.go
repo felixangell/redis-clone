@@ -18,14 +18,15 @@ func ParseCommand(v api.Value) (Command, error) {
 		panic(fmt.Sprintf("Did not expect value as command %s (type %s)", v, reflect.TypeOf(v)))
 	}
 
-	// NOTE do we care about case here?
 	cmd := strings.ToLower(string(cmdNameMsg.Data[:cmdNameMsg.Length]))
 
 	switch cmd {
 	case "hello":
 		return NewHelloCommand(bs.Data[1:]), nil
+
 	case "set":
 		return NewSetCommand(bs.Data[1:]), nil
+
 	case "get":
 		return NewGetCommand(bs.Data[1:]), nil
 	}

@@ -46,22 +46,7 @@ func (o *KafkaNodeOrchestrator) CacheBackend() cache.Cache {
 
 func (o *KafkaNodeOrchestrator) ClusterState() api.Value {
 	return api.KeyValueMap{
-		//"REDIS000000000017.0": "",
-		"run_id": o.id,
-
+		"run_id":     o.id,
 		"redis_mode": "standalone",
-
-		"cluster_enabled":     "1",
-		"cluster_state":       "ok",
-		"cluster_slots_pfail": "0",
-		"cluster_slots_fail":  "0",
-		"cluster_known_nodes": "1",
-		"cluster_size":        "1",
-		//"cluster_slots_ok":                "16384",
-		//"cluster_slots_assigned":          "16384",
-		//"cluster_current_epoch":           "7",
-		//"cluster_my_epoch":                "6",
-		//"cluster_stats_messages_sent":     "2174",
-		//"cluster_stats_messages_received": "2173",
 	}
 }

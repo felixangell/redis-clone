@@ -51,7 +51,7 @@ func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator) api.Value {
 	key := string(s.args[0].(api.BulkString).Data)
 	log.Println("Received key", key, "setting to", s.args[1])
 	orchestrator.Set(key, s.args[1])
-	return api.MakeSimpleString("OK")
+	return api.EncodeSimpleString("OK")
 }
 
 func NewSetCommand(args []api.Value) SetCommand {

@@ -50,9 +50,15 @@ type SimpleString struct {
 	Data   []byte
 }
 
-func MakeSimpleString(s string) SimpleString {
-	// FIXME simple string is a status or
-	// a fixed string, e.g. OK
+var legalSimpleStrings = map[string]bool{
+	"OK": true,
+}
+
+func EncodeSimpleString(s string) SimpleString {
+	if _, ok := legalSimpleStrings[s]; !ok {
+		panic("bad simple string")
+	}
+
 	return SimpleString{
 		Length: len(s),
 		Data:   []byte(s),
@@ -72,7 +78,7 @@ type BulkString struct {
 	Data   []byte
 }
 
-func MakeBulkString(s string) BulkString {
+func EncodeBulkString(s string) BulkString {
 	return BulkString{
 		Length: len(s),
 		Data:   []byte(s),
@@ -94,7 +100,7 @@ type IntegerValue struct {
 	Data []byte
 }
 
-func MakeInteger(v int) IntegerValue {
+func EncodeInteger(v int) IntegerValue {
 	return IntegerValue{
 		Data: []byte(strconv.Itoa(v)),
 	}

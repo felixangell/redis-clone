@@ -10,7 +10,7 @@ type Segment struct {
 
 type Partition struct {
 	// Segments are 'open' for either 1 week of time
-	// or until they reach 1GB of data. After this a
+	// or until they reach 1GB of keys. After this a
 	// new segment is created
 	Segments []Segment
 }

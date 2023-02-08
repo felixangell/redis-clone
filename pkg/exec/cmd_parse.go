@@ -1,13 +1,31 @@
 package exec
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bat-labs/krake/pkg/api"
 	"reflect"
 	"strings"
 )
 
-func ParseCommand(v api.Value) (Command, error) {
+var supportedCommands = map[string]Command{
+	"set": SetCommand{},
+	"get": GetCommand{},
+	"del": DelCommand{},
+
+	"hset": HSetComamnd{},
+	"hget": HGetCommand{},
+	"hdel": HDelCommand{},
+
+	"hello": HelloCommand{},
+}
+
+type ParsedCommandResult struct {
+	Command   Command
+	Arguments []api.Value
+}
+
+func ParseCommand(v api.Value) (*ParsedCommandResult, error) {
 	bs, ok := v.(api.Array)
 	if !ok {
 		panic(fmt.Sprintf("Did not expect value as command %s (type %s)", v, reflect.TypeOf(v)))
@@ -18,50 +36,15 @@ func ParseCommand(v api.Value) (Command, error) {
 		panic(fmt.Sprintf("Did not expect value as command %s (type %s)", v, reflect.TypeOf(v)))
 	}
 
-	cmd := strings.ToLower(string(cmdNameMsg.Data[:cmdNameMsg.Length]))
+	commandName := strings.ToLower(string(cmdNameMsg.Data[:cmdNameMsg.Length]))
 
-	switch cmd {
-
-	// internal
-
-	case "hello":
-		return NewHelloCommand(bs.Data[1:]), nil
-
-	// key based operations
-
-	case "set":
-		return NewSetCommand(bs.Data[1:]), nil
-
-	case "get":
-		return NewGetCommand(bs.Data[1:]), nil
-
-	case "del":
-		panic("not yet implemented")
-
-	// unordered hash set operations
-
-	case "hset":
-		// hset hash-key k1 v1
-		panic("not yet implemented")
-
-	case "hget":
-		// hget hash-key k1
-		panic("not yet implemented")
-
-	case "hgetall":
-		// entire hash content
-		panic("not yet implemented")
-
-	case "hdel":
-		// hdel hash-key k1
-		panic("not yet implemented")
-
-		// sets
-
-		// bitmap
-
-		// zsets
+	command, ok := supportedCommands[commandName]
+	if ok {
+		return &ParsedCommandResult{
+			Command:   command,
+			Arguments: bs.Data[1:],
+		}, nil
 	}
 
-	panic(fmt.Sprintf("Unhandled command %s", cmd))
+	return nil, errors.New("Unsupported command!")
 }

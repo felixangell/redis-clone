@@ -6,13 +6,12 @@ import (
 )
 
 type Command interface {
-	Execute(*KafkaNodeOrchestrator) api.Value
+	Execute(*KafkaNodeOrchestrator, ...api.Value) api.Value
 }
 
-type HelloCommand struct {
-}
+type HelloCommand struct{}
 
-func (h HelloCommand) Execute(*KafkaNodeOrchestrator) api.Value {
+func (h HelloCommand) Execute(_ *KafkaNodeOrchestrator, args ...api.Value) api.Value {
 	// HELLO command returns a MAP of the configuration for this
 	// cluster according to the redis spec.
 
@@ -38,38 +37,34 @@ func (h HelloCommand) Execute(*KafkaNodeOrchestrator) api.Value {
 	return configMap
 }
 
-func NewHelloCommand([]api.Value) HelloCommand {
-	return HelloCommand{}
-}
+type SetCommand struct{}
 
-type SetCommand struct {
-	args []api.Value
-}
-
-func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator) api.Value {
+func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator, args ...api.Value) api.Value {
 	// set key, value
-	key := string(s.args[0].(api.BulkString).Data)
-	log.Println("Received key", key, "setting to", s.args[1])
-	orchestrator.Set(key, s.args[1])
+	key := string(args[0].(api.BulkString).Data)
+	log.Println("Received key", key, "setting to", args[1])
+	orchestrator.CacheBackend().Set(key, args[1])
 	return api.EncodeSimpleString("OK")
 }
 
-func NewSetCommand(args []api.Value) SetCommand {
-	return SetCommand{
-		args: args,
-	}
-}
+type GetCommand struct{}
 
-type GetCommand struct {
-	args []api.Value
-}
-
-func (g GetCommand) Execute(orchestrator *KafkaNodeOrchestrator) api.Value {
-	key := string(g.args[0].(api.BulkString).Data)
-	result := orchestrator.Get(key)
+func (g GetCommand) Execute(orchestrator *KafkaNodeOrchestrator, args ...api.Value) api.Value {
+	key := string(args[0].(api.BulkString).Data)
+	result := orchestrator.CacheBackend().Get(key)
 	return result
 }
 
-func NewGetCommand(args []api.Value) GetCommand {
-	return GetCommand{args: args}
+type DelCommand struct{}
+
+func (d DelCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.Value {
+	key := string(args[0].(api.BulkString).Data)
+
+	err := o.CacheBackend().Del(key)
+	if err != nil {
+		log.Println(err)
+		return api.EncodeInteger(0)
+	}
+
+	return api.EncodeInteger(1)
 }

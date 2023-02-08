@@ -43,12 +43,13 @@ func (k *Krake) ListenAndServe(address string) {
 
 				value := parse.ParseMessage(buf[:bufLen])
 
-				command, err := exec.ParseCommand(value)
+				result, err := exec.ParseCommand(value)
 				if err != nil {
 					panic(err)
 				}
 
-				k.orchestrator.Submit(conn, command)
+				response := result.Command.Execute(k.orchestrator, result.Arguments...)
+				k.orchestrator.Submit(conn, response)
 			}
 		}(conn)
 	}

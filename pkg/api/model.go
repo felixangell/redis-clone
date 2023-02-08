@@ -5,6 +5,20 @@ import (
 	"strconv"
 )
 
+// DataTypePrefixByte specifies the prefix byte for determining
+// the data type of a message
+type DataTypePrefixByte byte
+
+const (
+	SimpleStringPrefix DataTypePrefixByte = '+'
+	BulkStringPrefix                      = '$'
+	IntegerPrefix                         = ':'
+	ArrayPrefix                           = '*'
+	ErrorPrefix                           = '-'
+)
+
+var TerminatorByteSequence = []byte{'\r', '\n'}
+
 type Value interface {
 	Serialize() []byte
 }
@@ -36,6 +50,15 @@ type SimpleString struct {
 	Data   []byte
 }
 
+func MakeSimpleString(s string) SimpleString {
+	// FIXME simple string is a status or
+	// a fixed string, e.g. OK
+	return SimpleString{
+		Length: len(s),
+		Data:   []byte(s),
+	}
+}
+
 func (s SimpleString) Serialize() []byte {
 	var buffer bytes.Buffer
 	buffer.WriteByte(byte(SimpleStringPrefix))
@@ -47,6 +70,13 @@ func (s SimpleString) Serialize() []byte {
 type BulkString struct {
 	Length int
 	Data   []byte
+}
+
+func MakeBulkString(s string) BulkString {
+	return BulkString{
+		Length: len(s),
+		Data:   []byte(s),
+	}
 }
 
 func (b BulkString) Serialize() []byte {
@@ -62,6 +92,12 @@ func (b BulkString) Serialize() []byte {
 
 type IntegerValue struct {
 	Data []byte
+}
+
+func MakeInteger(v int) IntegerValue {
+	return IntegerValue{
+		Data: []byte(strconv.Itoa(v)),
+	}
 }
 
 func NewIntegerValue(data []byte) *IntegerValue {

@@ -14,6 +14,7 @@ type Krake struct {
 
 func NewKrakeServer() *Krake {
 	cacheBackend := cache.NewInMemoryCache()
+
 	return &Krake{
 		orchestrator: exec.NewKafkaNodeOrchestrator(cacheBackend),
 	}

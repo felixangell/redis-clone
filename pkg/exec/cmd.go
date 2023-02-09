@@ -17,6 +17,17 @@ func (h HelloCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.V
 	return o.ClusterState()
 }
 
+type ExistsCommand struct{}
+
+func (e ExistsCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.Value {
+	key := string(args[0].(api.BulkString).Data)
+	if o.CacheBackend().Exists(key) {
+		return api.EncodeInteger(1)
+	}
+
+	return api.EncodeInteger(0)
+}
+
 type SetCommand struct{}
 
 func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator, args ...api.Value) api.Value {

@@ -6,6 +6,7 @@ type Cache interface {
 	Set(key string, value api.Value)
 	Get(key string) api.Value
 	Del(key string) error
+	Exists(key string) bool
 
 	HSet(hash string, field string, value api.Value)
 	HGet(hash string, field string) (api.Value, bool)
@@ -24,6 +25,11 @@ func NewInMemoryCache() *InMemoryCache {
 		keys:  map[string]api.Value{},
 		dicts: map[string]*KMap{},
 	}
+}
+
+func (n *InMemoryCache) Exists(field string) bool {
+	_, ok := n.keys[field]
+	return ok
 }
 
 func (n *InMemoryCache) Set(key string, value api.Value) {

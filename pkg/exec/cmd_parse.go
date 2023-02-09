@@ -18,6 +18,8 @@ var supportedCommands = map[string]Command{
 	"hdel": HDelCommand{},
 
 	"hello": HelloCommand{},
+
+	"exists": ExistsCommand{},
 }
 
 type ParsedCommandResult struct {

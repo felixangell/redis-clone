@@ -33,7 +33,6 @@ type SetCommand struct{}
 func (s SetCommand) Execute(orchestrator *KafkaNodeOrchestrator, args ...api.Value) api.Value {
 	// set key, value
 	key := string(args[0].(api.BulkString).Data)
-	log.Println("Received key", key, "setting to", args[1])
 	orchestrator.CacheBackend().Set(key, args[1])
 	return api.EncodeSimpleString("OK")
 }
@@ -58,4 +57,13 @@ func (d DelCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.Val
 	}
 
 	return api.EncodeInteger(1)
+}
+
+type IncryByCommand struct{}
+
+func (i IncryByCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.Value {
+	key := string(args[0].(api.BulkString).Data)
+	value := args[1]
+	//FIXME(FELIX): better error handling here pls
+	return o.CacheBackend().IncrBy(key, value)
 }

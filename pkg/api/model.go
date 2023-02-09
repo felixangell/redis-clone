@@ -2,11 +2,13 @@ package api
 
 import (
 	"bytes"
+	"fmt"
+	"reflect"
 	"strconv"
 )
 
 // DataTypePrefixByte specifies the prefix byte for determining
-// the data type of a message
+// the data type for a message
 type DataTypePrefixByte byte
 
 const (
@@ -21,11 +23,16 @@ var TerminatorByteSequence = []byte{'\r', '\n'}
 
 type Value interface {
 	Serialize() []byte
+	IncrBy(value Value) Value
 }
 
 type Array struct {
 	Length int
 	Data   []Value
+}
+
+func (a Array) IncrBy(o Value) Value {
+	panic("unsupported operation")
 }
 
 func (a Array) Serialize() []byte {
@@ -45,13 +52,17 @@ func NewArray(length int) *Array {
 	return &Array{Length: length}
 }
 
+var legalSimpleStrings = map[string]bool{
+	"OK": true,
+}
+
 type SimpleString struct {
 	Length int
 	Data   []byte
 }
 
-var legalSimpleStrings = map[string]bool{
-	"OK": true,
+func (s SimpleString) IncrBy(o Value) Value {
+	panic("unsupported operation")
 }
 
 func EncodeSimpleString(s string) SimpleString {
@@ -78,6 +89,10 @@ type BulkString struct {
 	Data   []byte
 }
 
+func (b BulkString) IncrBy(o Value) Value {
+	panic("unsupported operation")
+}
+
 func EncodeBulkString(s string) BulkString {
 	return BulkString{
 		Length: len(s),
@@ -100,14 +115,37 @@ type IntegerValue struct {
 	Data []byte
 }
 
+// TODO(FELIX): Delete me.
+func (i IntegerValue) yolo() int {
+	curr, err := strconv.Atoi(string(i.Data))
+	if err != nil {
+		panic(err)
+	}
+	return curr
+}
+
+func (i IntegerValue) IncrBy(o Value) Value {
+	curr := i.yolo()
+
+	switch other := o.(type) {
+	case IntegerValue:
+		otherNum := other.yolo()
+		return EncodeInteger(curr + otherNum)
+	case BulkString:
+		otherNum, err := strconv.Atoi(string(other.Data))
+		if err != nil {
+			panic(err)
+		}
+		return EncodeInteger(curr + otherNum)
+	}
+
+	panic(fmt.Sprintf("unsupported operation incr by %v (%s)", o, reflect.TypeOf(o)))
+}
+
 func EncodeInteger(v int) IntegerValue {
 	return IntegerValue{
 		Data: []byte(strconv.Itoa(v)),
 	}
-}
-
-func NewIntegerValue(data []byte) *IntegerValue {
-	return &IntegerValue{Data: data}
 }
 
 func (i IntegerValue) Serialize() []byte {

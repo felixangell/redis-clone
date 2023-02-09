@@ -1,11 +1,14 @@
 package cache
 
-import "github.com/bat-labs/krake/pkg/api"
+import (
+	"github.com/bat-labs/krake/pkg/api"
+)
 
 type Cache interface {
 	Set(key string, value api.Value)
 	Get(key string) api.Value
 	Del(key string) error
+	IncrBy(key string, value api.Value) api.Value
 	Exists(key string) bool
 
 	HSet(hash string, field string, value api.Value)
@@ -25,6 +28,19 @@ func NewInMemoryCache() *InMemoryCache {
 		keys:  map[string]api.Value{},
 		dicts: map[string]*KMap{},
 	}
+}
+
+func (n *InMemoryCache) IncrBy(key string, other api.Value) api.Value {
+	v, ok := n.keys[key]
+	if !ok {
+		result := api.EncodeInteger(0)
+		n.Set(key, result)
+		return result
+	}
+
+	increased := v.IncrBy(other)
+	n.Set(key, increased)
+	return increased
 }
 
 func (n *InMemoryCache) Exists(field string) bool {

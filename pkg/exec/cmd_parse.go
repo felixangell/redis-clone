@@ -13,6 +13,8 @@ var supportedCommands = map[string]Command{
 	"get": GetCommand{},
 	"del": DelCommand{},
 
+	"incrby": IncryByCommand{},
+
 	"hset": HSetComamnd{},
 	"hget": HGetCommand{},
 	"hdel": HDelCommand{},

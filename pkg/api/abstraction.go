@@ -2,6 +2,10 @@ package api
 
 type KeyValueMap map[string]string
 
+func (k KeyValueMap) IncrBy(value Value) Value {
+	panic("unsupported operation")
+}
+
 func (k KeyValueMap) Serialize() []byte {
 	a := NewArray(len(k) * 2)
 

@@ -21,7 +21,28 @@ var supportedCommands = map[string]Command{
 
 	"hello": HelloCommand{},
 
-	"exists": ExistsCommand{},
+	"exists":  ExistsCommand{},
+	"persist": PersistCommand{},
+
+	"expire": ExpireCommand{},
+	"ttl":    nil,
+	"incr":   nil,
+	"decr":   nil,
+
+	"rpush":  nil,
+	"lpush":  nil,
+	"lrange": nil,
+	"lindex": nil,
+
+	"hmget": nil,
+	"hmset": nil,
+
+	"sadd":      nil,
+	"smembers":  nil,
+	"sismember": nil,
+
+	"zadd":   nil,
+	"zrange": nil,
 }
 
 type ParsedCommandResult struct {

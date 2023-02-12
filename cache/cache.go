@@ -11,6 +11,8 @@ type Cache interface {
 	IncrBy(key string, value api.Value) api.Value
 	Exists(key string) bool
 
+	Expire(key string, seconds string, kind api.Value) api.Value
+
 	HSet(hash string, field string, value api.Value)
 	HGet(hash string, field string) (api.Value, bool)
 	HDel(hash string, fields ...string) error
@@ -94,4 +96,9 @@ func (n *InMemoryCache) HDel(hash string, fields ...string) error {
 		delete(*d, f)
 	}
 	return nil
+}
+
+func (n *InMemoryCache) Expire(key string, seconds string, kind api.Value) api.Value {
+	//TODO implement me
+	panic("implement me")
 }

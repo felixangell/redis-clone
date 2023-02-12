@@ -67,3 +67,26 @@ func (i IncryByCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api
 	//FIXME(FELIX): better error handling here pls
 	return o.CacheBackend().IncrBy(key, value)
 }
+
+type ExpireCommand struct{}
+
+func (e ExpireCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.Value {
+	key := string(args[0].(api.BulkString).Data)
+	seconds := string(args[1].(api.BulkString).Data)
+
+	// NX, XX, GT, LT
+	kind := args[2]
+
+	//Note that calling EXPIRE/PEXPIRE with a non-positive timeout or
+	//EXPIREAT/PEXPIREAT with a time in the past will result in the key
+	//being deleted rather than expired (accordingly, the emitted
+	//key event will be del, not expired).
+
+	return o.CacheBackend().Expire(key, seconds, kind)
+}
+
+type PersistCommand struct{}
+
+func (p PersistCommand) Execute(o *KafkaNodeOrchestrator, args ...api.Value) api.Value {
+	panic("not done yet mate")
+}

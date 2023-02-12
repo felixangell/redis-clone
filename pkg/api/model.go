@@ -116,7 +116,7 @@ type IntegerValue struct {
 }
 
 // TODO(FELIX): Delete me.
-func (i IntegerValue) yolo() int {
+func (i IntegerValue) Yolo() int {
 	curr, err := strconv.Atoi(string(i.Data))
 	if err != nil {
 		panic(err)
@@ -125,11 +125,11 @@ func (i IntegerValue) yolo() int {
 }
 
 func (i IntegerValue) IncrBy(o Value) Value {
-	curr := i.yolo()
+	curr := i.Yolo()
 
 	switch other := o.(type) {
 	case IntegerValue:
-		otherNum := other.yolo()
+		otherNum := other.Yolo()
 		return EncodeInteger(curr + otherNum)
 	case BulkString:
 		otherNum, err := strconv.Atoi(string(other.Data))
